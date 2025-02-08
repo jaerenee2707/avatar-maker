@@ -3,39 +3,37 @@ import './App.css';
 import MainNavigationButton from './components/MainNavigationButton';
 import SubNavigationButton from './components/SubNavigationButton';
 import ItemButton from './components/ItemButton';
+import { categories } from './categories'
 
 function App() {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
-    const categories = [{
-        name: 'Face',
-        icon: '👤',
-        subCategories: [
-            {
-                name: 'Nose',
-                choices: [{ name: 'Small', icon: '👃', onSelect: () => { } }, { name: 'Large', icon: '👃', onSelect: () => { } }],
-            },
-            {
-                name: 'Eyes',
-                choices: [{ name: 'Blue', icon: '👁', onSelect: () => { } }, { name: 'Brown', icon: '👁', onSelect: () => { } }],
-            },
-            {
-                name: 'Mouth',
-                choices: [{ name: 'Smile', icon: '👄', onSelect: () => { } }, { name: 'Frown', icon: '👄', onSelect: () => { } }],
-            },
-            {
-                name: 'Skin Color',
-                choices: [
-                    { name: 'Light', icon: '🤍', onSelect: () => { } },
-                    { name: 'Dark', icon: '🖤', onSelect: () => { } },
-                ],
-            },
-        ],
-    }];
+    const getLocalStore = localStorage.getItem('choices');
+    const parsedLocalStore = getLocalStore ? JSON.parse(getLocalStore) : {};
+    const intialChoices = categories.reduce((accumulator, category) => {
+        category.subCategories.forEach(subCategory => {
+            const valueRetrieved = parsedLocalStore[subCategory.name] || "None";
+            accumulator[subCategory.name] = valueRetrieved;
+        });
+        return accumulator;
+    }, {});
+
+    const [selectedChoices, setSelectedChoices] = useState(intialChoices);
+
+
+    function handleChoiceSelect(subCategoryName, choiceName) {
+        setSelectedChoices({ ...selectedChoices, [subCategoryName]: choiceName });
+    }
+
+    function handleDownload() {
+        console.log(selectedChoices);
+        localStorage.setItem('choices', JSON.stringify(selectedChoices));
+    }
 
     return (
         <div className="App">
+
             <div className="main-nav">
                 {categories.map((category) => (
                     <MainNavigationButton
@@ -43,44 +41,59 @@ function App() {
                         {...category}
                         selectedCategory={selectedCategory}
                         setSelectedCategory={setSelectedCategory}
+                        setSelectedSubCategory={setSelectedSubCategory}
                     />
                 ))}
             </div>
+
             <div className="middle-section">
                 <div className="avatar-preview">
                     <div className="placeholder">Avatar Preview</div>
                 </div>
+
                 <input type="text" placeholder="Enter name" />
 
                 <div className="action-buttons">
                     <button className="action-button">Restart</button>
-                    <button className="action-button" id="download-button">Download</button>
+                    <button className="action-button" id="download-button" onClick={handleDownload}>
+                        Download
+                    </button>
                     <button className="action-button">Randomize</button>
                 </div>
+
             </div>
 
             <div className="sub-nav">
+
                 <div className="sub-nav-buttons">
                     {selectedCategory && selectedCategory.subCategories.map((sub) => (
                         <div className="sub-nav-button">
-                        <SubNavigationButton
-                            key={sub.name}
-                            {...sub}
-                            selectedSubCategory={selectedSubCategory}
-                            setSelectedSubCategory={setSelectedSubCategory}
-                        />
-                    </div>
-                ))}
+                            <SubNavigationButton
+                                key={sub.name}
+                                {...sub}
+                                selectedSubCategory={selectedSubCategory}
+                                setSelectedSubCategory={setSelectedSubCategory}
+                            />
+                        </div>
+                    ))}
                 </div>
+
                 <div className="item-display">
-                    {selectedCategory && selectedSubCategory && selectedSubCategory.choices.map((choice) => (
-                        <ItemButton key={choice.name} {...choice} />
+                    {selectedSubCategory && selectedSubCategory.choices.map((choice) => (
+                        <ItemButton
+                            key={choice.name}
+                            {...choice}
+                            subCategoryName={selectedSubCategory.name}
+                            handleChoiceSelect={handleChoiceSelect}
+                            selectedChoices={selectedChoices}
+                        />
                     ))}
                 </div>
 
                 <div className="color-selector">
                     <div className="placeholder">Color Selector</div>
                 </div>
+
             </div>
         </div>
     );

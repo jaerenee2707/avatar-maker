@@ -1,0 +1,6 @@
+/*
+ <div className="item-display">
+                    {selectedCategory && selectedSubCategory && selectedSubCategory.choices.map((choice) => (
+                        <ItemButton key={choice.name} {...choice} handleChoiceSelect={handleChoiceSelect} />
+                    ))} 
+                </div> */
