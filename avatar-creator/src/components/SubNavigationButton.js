@@ -2,21 +2,16 @@ import React from 'react';
 import ItemButton from './ItemButton';
 
 function SubNavigationButton({ name, choices, selectedSubCategory, setSelectedSubCategory }) {
-    const isSelected = (selectedSubCategory === name);
+    const isSelected = selectedSubCategory && (selectedSubCategory.name === name);
     function handleSelect() {
-        setSelectedSubCategory(isSelected ? null : name)
+        setSelectedSubCategory(isSelected ? null : { name, choices })
     }
 
     return (
         <div className="sub-navigation">
-            <h4 onClick={handleSelect} >{name}</h4>
-            {isSelected && (
-                <div className="choices-list">
-                    {choices.map((choice) => (
-                        <ItemButton key={choice.name} {...choice} />
-                    ))}
-                </div>
-            )}
+            <h4 onClick={handleSelect} >
+                {name}
+            </h4>
         </div>
     );
 }

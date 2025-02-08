@@ -1,30 +1,16 @@
 import React, { useState } from 'react';
 import SubNavigationButton from './SubNavigationButton';
 
-function MainNavigationButton({ icon, name, subCategories, selectedSubCategory, setSelectedSubCategory }) {
-    const [isVisible, setIsVisible] = useState(false);
-
-    function toggleVisibility() {
-        setIsVisible(!isVisible);
+function MainNavigationButton({ icon, name, subCategories, selectedCategory, setSelectedCategory }) {
+    const isSelected = selectedCategory && (selectedCategory.name === name);
+    function handleSelect() {
+        setSelectedCategory(isSelected ? null : { name, subCategories })
     }
-
     return (
         <div>
-            <button onClick={toggleVisibility}>
+            <button onClick={handleSelect}>
                 {icon} {name}
             </button>
-            {isVisible && (
-                <div className="sub-category-list">
-                    {subCategories.map((sub) => (
-                        <SubNavigationButton
-                            key={sub.name}
-                            {...sub}
-                            selectedSubCategory={selectedSubCategory}
-                            setSelectedSubCategory={setSelectedSubCategory}
-                        />
-                    ))}
-                </div>
-            )}
         </div>
     );
 }
